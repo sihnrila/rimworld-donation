@@ -1,0 +1,14 @@
+{
+  "items": [
+    { "defName": "Silver",               "label": "실버",           "minAmount": 50,  "maxAmount": 200, "weight": 30 },
+    { "defName": "Steel",                "label": "철",             "minAmount": 30,  "maxAmount": 100, "weight": 20 },
+    { "defName": "Medicine",             "label": "의약품",          "minAmount": 5,   "maxAmount": 20,  "weight": 15 },
+    { "defName": "ComponentIndustrial",  "label": "부품",           "minAmount": 3,   "maxAmount": 10,  "weight": 15 },
+    { "defName": "MealFine",             "label": "훌륭한 식사",     "minAmount": 5,   "maxAmount": 20,  "weight": 10 },
+    { "defName": "SurvivalMeal",         "label": "생존 식량",       "minAmount": 5,   "maxAmount": 20,  "weight": 10 },
+    { "defName": "Plasteel",             "label": "플라스틸",        "minAmount": 5,   "maxAmount": 20,  "weight": 8  },
+    { "defName": "Gold",                 "label": "금",             "minAmount": 10,  "maxAmount": 50,  "weight": 5  },
+    { "defName": "Beer",                 "label": "맥주",           "minAmount": 5,   "maxAmount": 25,  "weight": 10 },
+    { "defName": "GlitterworldMedicine", "label": "글리터월드 약품", "minAmount": 2,   "maxAmount": 8,   "weight": 3  }
+  ]
+}

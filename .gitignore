@@ -9,6 +9,9 @@ server/node_modules/
 data/
 server/data/
 
+# 자동 생성 설정 (머신별 경로 포함)
+config/settings.json
+
 # 환경변수
 server/.env
 .env

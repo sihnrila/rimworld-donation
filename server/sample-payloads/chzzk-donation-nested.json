@@ -1,0 +1,10 @@
+{
+  "eventType": "CHAT_DONATION",
+  "channelId": "abc123def456",
+  "data": {
+    "payType": "CHAT",
+    "payAmount": 10000,
+    "nickname": "슈퍼치즈",
+    "message": "메카 습격 보내줘요!"
+  }
+}

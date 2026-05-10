@@ -1,0 +1,9 @@
+{
+  "mappings": [
+    { "minAmount": 10000, "eventType": "mech_raid", "label": "메카노이드 습격" },
+    { "minAmount": 7000,  "eventType": "fire",      "label": "화재 발생" },
+    { "minAmount": 5000,  "eventType": "raid",      "label": "적 습격" },
+    { "minAmount": 3000,  "eventType": "animal",    "label": "동물 폭주" },
+    { "minAmount": 1000,  "eventType": "item",      "label": "아이템 드랍" }
+  ]
+}

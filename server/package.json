@@ -7,7 +7,7 @@
     "dev": "tsx src/index.ts",
     "build": "tsup src/index.ts --format cjs --out-dir dist --no-splitting --minify",
     "start": "node dist/index.cjs",
-    "package:win": "npm run build && pkg dist/index.cjs --target node18-win-x64 --output ../streamer-app.exe --no-bytecode --public-packages \"*\" --public",
+    "package:win": "npm run build && npx @yao-pkg/pkg dist/index.cjs --target node18-win-x64 --output ../streamer-app.exe --no-bytecode --public-packages \"*\" --public",
     "test:chzzk": "node scripts/send-test-chzzk.mjs"
   },
   "dependencies": {
@@ -30,7 +30,8 @@
       "node18-win-x64"
     ],
     "assets": [
-      "data/**"
+      "data/**",
+      "config/**"
     ]
   }
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>RimWorld Donation Events</name>
+  <author>Rila</author>
+  <supportedVersions>
+    <li>1.5</li>
+  </supportedVersions>
+  <packageId>rila.rimworld.donationevents</packageId>
+  <description>
+후원 이벤트를 받아 게임 내 사건으로 실행하는 모드입니다.
+
+streamer-app.exe 와 함께 사용하세요.
+대시보드: http://localhost:33210
+
+지원 이벤트:
+- item : 아이템 드랍 (Silver, Medicine 등)
+- animal : 동물 폭주 (ManhunterPack)
+- raid : 적 습격
+- fire : 맵 랜덤 화재
+- mech_raid : 메카노이드 클러스터 (실패 시 강화 레이드)
+
+2PC 구성 (게임컴 / 송출컴 분리):
+%LocalAppData%\RimWorldDonation\server.url 파일에 서버 URL 입력
+예) http://192.168.1.100:33210
+  </description>
+</ModMetaData>
