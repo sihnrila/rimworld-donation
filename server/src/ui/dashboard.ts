@@ -69,6 +69,34 @@ export const dashboardHtml = /* html */`<!DOCTYPE html>
     .empty-row td { color: var(--text2); text-align: center; padding: 24px; }
     .msg-cell { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text2); }
     code { background: var(--bg); padding: 1px 6px; border-radius: 4px; font-size: .8rem; }
+    /* 로그 테이블 가로 스크롤 보장 */
+    table.log-tbl { min-width: 560px; }
+    /* ── 모바일 반응형 ─────────────────────────────────────────── */
+    @media (max-width: 540px) {
+      header { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
+      header h1 { font-size: .88rem; flex-shrink: 1; min-width: 0; }
+      .timer { display: none; }
+      nav { margin-left: auto; flex-shrink: 0; }
+      .nav-link { padding: 4px 10px; font-size: .76rem; }
+      .container { padding: 12px 10px; gap: 12px; }
+      .card { padding: 14px 12px; }
+      /* iOS zoom 방지: input font-size 16px 이상 필요 */
+      input[type=number], input[type=text] { font-size: 1rem; padding: 8px 10px; }
+      .cfg-table input[type=number] { width: 58px; font-size: 1rem; padding: 6px 4px; }
+      /* 버튼 최소 탭 높이 44px (iOS HIG 기준) */
+      button { min-height: 44px; padding: 10px 14px; font-size: .9rem; }
+      .btn-save { width: 100%; }
+      /* 금액 입력 행 줄바꿈 허용 */
+      .amount-row { flex-wrap: wrap; }
+      .amount-row input[type=number] { flex: 1; min-width: 80px; width: auto !important; }
+      .amount-row button { flex: 0 0 auto; }
+      /* 연결 안내 카드 */
+      code { font-size: .72rem; word-break: break-all; }
+    }
+    @media (max-width: 360px) {
+      .badge { font-size: .65rem; padding: 2px 7px; }
+      .nav-link { padding: 3px 8px; }
+    }
   </style>
 </head>
 <body>

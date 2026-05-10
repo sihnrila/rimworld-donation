@@ -113,6 +113,32 @@ export const settingsHtml = /* html */`<!DOCTYPE html>
 
     /* ── 구분선 ── */
     hr { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 4px 0; }
+    /* ── 모바일 반응형 ─────────────────────────────────────────── */
+    @media (max-width: 540px) {
+      header { padding: 10px 12px; gap: 8px; }
+      header h1 { font-size: .88rem; flex-shrink: 1; min-width: 0; }
+      nav { margin-left: auto; flex-shrink: 0; }
+      .nav-link { padding: 4px 10px; font-size: .76rem; }
+      .container { padding: 14px 10px; gap: 14px; }
+      .card { padding: 16px 12px; }
+      /* iOS zoom 방지 */
+      .field input[type=text], .field input[type=number] { font-size: 1rem; padding: 10px 12px; }
+      /* 버튼 탭 영역 */
+      .btn { min-height: 44px; padding: 10px 18px; }
+      .btn-row { flex-direction: column; }
+      .btn-row .btn { width: 100%; text-align: center; }
+      /* Webhook URL: URL+복사 버튼 세로 배치 */
+      .webhook-url-row { flex-direction: column; gap: 6px; }
+      .btn-copy { width: 100%; text-align: center; padding: 9px 12px; min-height: 40px; }
+      .webhook-url { font-size: .76rem; }
+      /* 서버 정보 그리드 */
+      .info-grid { grid-template-columns: auto 1fr; gap: 6px 10px; }
+      .info-val code { font-size: .76rem; word-break: break-all; }
+    }
+    @media (max-width: 360px) {
+      .nav-link { padding: 3px 8px; font-size: .72rem; }
+      .platform-badge { font-size: .65rem; }
+    }
   </style>
 </head>
 <body>
