@@ -6,7 +6,11 @@
 rimworld-donation-mvp/
 ├── streamer-app.exe          ← 서버 실행파일 (더블클릭)
 ├── rimworld-mod/             ← RimWorld 모드 폴더
-├── config/event-mapping.json ← 금액별 이벤트 참조
+├── config/
+│   ├── event-mapping.json    ← 금액별 이벤트 매핑 (웹 UI에서 수정 가능)
+│   └── item-drops.json       ← 아이템 드랍 풀 (웹 UI에서 수정 가능)
+├── tools/
+│   └── fake-rimworld-client.js ← RimWorld 없이 연동 테스트용
 └── README_설치가이드.md
 ```
 
@@ -159,6 +163,87 @@ Invoke-WebRequest -Uri http://localhost:33210/api/status | Select -Expand Conten
 # 로그 확인
 Invoke-WebRequest -Uri http://localhost:33210/api/logs | Select -Expand Content
 ```
+
+---
+
+---
+
+## RimWorld 없이 테스트하는 법 (fake client)
+
+RimWorld를 설치하지 않아도 서버-모드 간 연동 구조 전체를 검증할 수 있습니다.
+
+### 준비
+
+Node.js 18 이상 필요 (없으면 https://nodejs.org 설치)
+
+### 실행 순서
+
+**터미널 A — 서버 시작**
+```bash
+# exe 사용
+streamer-app.exe
+
+# 또는 소스 직접 실행
+cd server && npm run dev
+```
+
+**터미널 B — fake client 실행**
+```bash
+node tools/fake-rimworld-client.js
+```
+
+정상 실행 시:
+```
+[FakeClient] 시작 → http://localhost:33210/event  (2초 간격)
+[FakeClient] 범례: . = 대기중  x = 서버 없음  이벤트 박스 = 수신 성공
+
+..........
+```
+
+**브라우저 — 대시보드에서 테스트 이벤트 전송**
+
+`http://localhost:33210` 접속 → 테스트 버튼 클릭
+
+fake client 콘솔에 아래처럼 출력되면 서버-연동 구조 정상:
+```
+┌────────────────────────────────────────────────
+│ #1  🔥 fire          테스트후원자
+│ 금액     : 7,000원
+│ 플랫폼   : test
+│ 메시지   : 대시보드 테스트
+│ 수신     : 오후 3:25:01
+└────────────────────────────────────────────────
+```
+
+item 이벤트는 아이템 정보도 함께 출력됩니다:
+```
+┌────────────────────────────────────────────────
+│ #2  💰 item          테스트후원자
+│ 금액     : 1,000원
+│ 플랫폼   : test
+│ 아이템   : Silver × 147
+│ 수신     : 오후 3:25:05
+└────────────────────────────────────────────────
+```
+
+### 2PC 테스트 (게임컴에서 fake client 실행)
+
+```bash
+SERVER_URL=http://192.168.1.100:33210 node tools/fake-rimworld-client.js
+```
+
+콘솔에 이벤트가 찍히면 게임컴↔송출컴 연결 정상.
+이 상태에서 RimWorld 모드만 설치하면 바로 사용 가능합니다.
+
+---
+
+## 이벤트 가격 / 아이템 설정 변경
+
+브라우저 대시보드(`http://localhost:33210`)에서 직접 수정 후 저장하면 **서버 재시작 없이 즉시 적용**됩니다.
+
+직접 파일 수정도 가능합니다 (저장하면 자동 감지):
+- `config/event-mapping.json` — 금액 구간 설정
+- `config/item-drops.json` — 아이템 풀, 확률(weight), 수량 범위
 
 ---
 
