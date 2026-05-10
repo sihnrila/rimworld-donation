@@ -17,7 +17,11 @@ export const dashboardHtml = /* html */`<!DOCTYPE html>
     .badge { padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; transition: background .3s; }
     .badge.ok { background: var(--green); color: #000; }
     .badge.offline { background: var(--accent); color: #fff; }
-    .timer { margin-left: auto; color: var(--text2); font-size: .75rem; }
+    .timer { color: var(--text2); font-size: .75rem; }
+    nav { margin-left: auto; display: flex; gap: 4px; }
+    .nav-link { padding: 5px 14px; border-radius: 7px; font-size: .82rem; font-weight: 700; text-decoration: none; color: var(--text2); transition: background .15s, color .15s; }
+    .nav-link:hover { background: rgba(255,255,255,.07); color: var(--text); }
+    .nav-link.active { background: var(--accent); color: #fff; }
     .container { max-width: 1000px; margin: 0 auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
     .row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
     @media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
@@ -73,6 +77,10 @@ export const dashboardHtml = /* html */`<!DOCTYPE html>
   <h1>RimWorld 후원 연동</h1>
   <span class="badge offline" id="conn-badge">연결 중...</span>
   <span class="timer" id="timer"></span>
+  <nav>
+    <a href="/"        class="nav-link active">대시보드</a>
+    <a href="/settings" class="nav-link">설정</a>
+  </nav>
 </header>
 
 <div class="container">

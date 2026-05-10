@@ -9,6 +9,7 @@ import {
 import { getRecentLogs } from '../services/log.service.js';
 import { getMappings, updateMappings } from '../services/eventMapping.service.js';
 import { getItemDrops, updateItemDrops } from '../services/itemDrop.service.js';
+import { getAppSettings, updateAppSettings, getDefaultEventFilePath } from '../services/settings.service.js';
 import type { DonationEventType, MappingEntry, ItemDropEntry } from '../types.js';
 
 export const apiRouter = Router();
@@ -16,7 +17,6 @@ export const apiRouter = Router();
 const VALID_EVENT_TYPES = new Set<DonationEventType>(['item', 'animal', 'raid', 'mech_raid', 'fire']);
 
 // ─── 게임 모드 폴링 ─────────────────────────────────────────────────────────
-// 1회성 consume — 읽으면 event.json 삭제
 apiRouter.get('/event', async (_req, res) => {
   const event = await consumeCurrentEvent();
   if (!event) return res.status(204).send();
@@ -88,6 +88,40 @@ apiRouter.put('/api/config/item-drops', (req, res) => {
     }
     const updated = updateItemDrops(items);
     return res.json({ ok: true, items: updated });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: String(err) });
+  }
+});
+
+// ─── 설정: 앱 설정 (event.json 경로 등) ────────────────────────────────────
+apiRouter.get('/api/config/settings', (_req, res) => {
+  return res.json({ ok: true, settings: getAppSettings() });
+});
+
+apiRouter.put('/api/config/settings', (req, res) => {
+  try {
+    const { eventFilePath } = req.body ?? {};
+    if (eventFilePath !== undefined && typeof eventFilePath !== 'string') {
+      return res.status(400).json({ ok: false, error: 'eventFilePath는 문자열이어야 합니다' });
+    }
+    const partial: Record<string, unknown> = {};
+    if (typeof eventFilePath === 'string' && eventFilePath.trim()) {
+      partial['eventFilePath'] = eventFilePath.trim();
+    }
+    if (Object.keys(partial).length === 0) {
+      return res.status(400).json({ ok: false, error: '변경할 설정 없음' });
+    }
+    const updated = updateAppSettings(partial as Parameters<typeof updateAppSettings>[0]);
+    return res.json({ ok: true, settings: updated });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: String(err) });
+  }
+});
+
+apiRouter.post('/api/config/settings/reset-event-path', (_req, res) => {
+  try {
+    const updated = updateAppSettings({ eventFilePath: getDefaultEventFilePath() });
+    return res.json({ ok: true, settings: updated });
   } catch (err) {
     return res.status(500).json({ ok: false, error: String(err) });
   }
