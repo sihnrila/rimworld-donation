@@ -1,11 +1,9 @@
 {
   "mappings": [
-    { "minAmount": 10000, "eventType": "mech_raid", "label": "메카노이드 습격",  "points": 1200 },
-    { "minAmount": 7000,  "eventType": "fire",      "label": "화재 발생",        "points": 0    },
-    { "minAmount": 5000,  "eventType": "raid",      "label": "적 습격",          "points": 500  },
-    { "minAmount": 3000,  "eventType": "animal",    "label": "동물 폭주",        "points": 300  },
-    { "minAmount": 1000,  "eventType": "item",      "label": "아이템 드랍",      "points": 0    }
-  ],
-  "default": "item",
-  "_note": "이 파일은 참조용입니다. 실제 매핑 변경은 server/src/services/eventMapping.service.ts를 수정하세요."
+    { "minAmount": 10000, "eventType": "mech_raid", "label": "메카노이드 습격" },
+    { "minAmount": 7000,  "eventType": "fire",      "label": "화재 발생" },
+    { "minAmount": 5000,  "eventType": "raid",      "label": "적 습격" },
+    { "minAmount": 3000,  "eventType": "animal",    "label": "동물 폭주" },
+    { "minAmount": 1000,  "eventType": "item",      "label": "아이템 드랍" }
+  ]
 }

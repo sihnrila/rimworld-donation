@@ -1,3 +1,4 @@
+using System;
 using RimWorld;
 using Verse;
 
@@ -37,7 +38,7 @@ namespace RimDonation
                     break;
                 case "item":
                 default:
-                    ExecuteItemDrop(map);
+                    ExecuteItemDrop(map, donationEvent.itemDefName, donationEvent.itemAmount);
                     break;
             }
         }
@@ -48,15 +49,12 @@ namespace RimDonation
             IncidentParms parms = StorytellerUtility.DefaultParmsNow(def.category, map);
             parms.points = points;
             bool ok = def.Worker.TryExecute(parms);
-            if (ok)
-                Log.Message("[RimDonation] 레이드 발생 성공");
-            else
-                Log.Warning("[RimDonation] 레이드 발생 실패 (TryExecute=false)");
+            if (ok) Log.Message("[RimDonation] 레이드 발생 성공");
+            else    Log.Warning("[RimDonation] 레이드 발생 실패 (TryExecute=false)");
         }
 
         private static void ExecuteMechRaid(Map map, float points)
         {
-            // MechCluster 시도, 실패 시 강화 레이드로 fallback
             IncidentDef mechDef = DefDatabase<IncidentDef>.GetNamedSilentFail("MechCluster");
             if (mechDef != null)
             {
@@ -78,10 +76,8 @@ namespace RimDonation
             IncidentParms parms = StorytellerUtility.DefaultParmsNow(def.category, map);
             parms.points = points;
             bool ok = def.Worker.TryExecute(parms);
-            if (ok)
-                Log.Message("[RimDonation] 동물 폭주 발생 성공");
-            else
-                Log.Warning("[RimDonation] 동물 폭주 발생 실패 (TryExecute=false)");
+            if (ok) Log.Message("[RimDonation] 동물 폭주 발생 성공");
+            else    Log.Warning("[RimDonation] 동물 폭주 발생 실패");
         }
 
         private static void ExecuteFire(Map map)
@@ -92,34 +88,39 @@ namespace RimDonation
             {
                 tries++;
                 IntVec3 cell = CellFinderLoose.RandomCellWith(
-                    c => c.Standable(map) && !c.Fogged(map),
-                    map
-                );
+                    c => c.Standable(map) && !c.Fogged(map), map);
                 if (!cell.IsValid) continue;
-                bool ok = FireUtility.TryStartFireIn(cell, map, Rand.Range(0.4f, 1.0f), null);
-                if (ok) started++;
+                if (FireUtility.TryStartFireIn(cell, map, Rand.Range(0.4f, 1.0f), null))
+                    started++;
             }
             Log.Message($"[RimDonation] 화재 {started}곳 발생");
         }
 
-        private static void ExecuteItemDrop(Map map)
+        private static void ExecuteItemDrop(Map map, string itemDefName, int itemAmount)
         {
-            IntVec3 cell = DropCellFinder.TradeDropSpot(map);
+            // defName 유효성 확인
+            ThingDef thingDef = null;
+            if (!string.IsNullOrEmpty(itemDefName))
+            {
+                thingDef = DefDatabase<ThingDef>.GetNamedSilentFail(itemDefName);
+                if (thingDef == null)
+                    Log.Warning($"[RimDonation] 알 수 없는 itemDefName: {itemDefName}, Silver로 대체");
+            }
+            if (thingDef == null)
+                thingDef = ThingDefOf.Silver;
 
-            if (Rand.Bool)
-            {
-                Thing silver = ThingMaker.MakeThing(ThingDefOf.Silver);
-                silver.stackCount = 100;
-                GenPlace.TryPlaceThing(silver, cell, map, ThingPlaceMode.Near);
-                Log.Message("[RimDonation] 실버 100개 드랍");
-            }
-            else
-            {
-                Thing meal = ThingMaker.MakeThing(ThingDefOf.MealSimple);
-                meal.stackCount = 20;
-                GenPlace.TryPlaceThing(meal, cell, map, ThingPlaceMode.Near);
-                Log.Message("[RimDonation] 식사 20개 드랍");
-            }
+            // 수량 결정 (0이면 fallback)
+            int amount = itemAmount > 0 ? itemAmount : Rand.RangeInclusive(1, 50);
+            // 스택 한도 초과 방지
+            if (thingDef.stackLimit > 0)
+                amount = Math.Min(amount, thingDef.stackLimit);
+
+            IntVec3 cell = DropCellFinder.TradeDropSpot(map);
+            Thing thing = ThingMaker.MakeThing(thingDef);
+            thing.stackCount = amount;
+            GenPlace.TryPlaceThing(thing, cell, map, ThingPlaceMode.Near);
+
+            Log.Message($"[RimDonation] 아이템 드랍: {thingDef.defName} × {amount}");
         }
     }
 }

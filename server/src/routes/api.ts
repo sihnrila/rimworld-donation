@@ -7,22 +7,23 @@ import {
   consumeCurrentEvent
 } from '../services/event.service.js';
 import { getRecentLogs } from '../services/log.service.js';
-import type { DonationEventType } from '../types.js';
+import { getMappings, updateMappings } from '../services/eventMapping.service.js';
+import { getItemDrops, updateItemDrops } from '../services/itemDrop.service.js';
+import type { DonationEventType, MappingEntry, ItemDropEntry } from '../types.js';
 
 export const apiRouter = Router();
 
 const VALID_EVENT_TYPES = new Set<DonationEventType>(['item', 'animal', 'raid', 'mech_raid', 'fire']);
 
-// RimWorld 모드가 폴링하는 엔드포인트 — 1회성 consume (읽으면 event.json 삭제)
+// ─── 게임 모드 폴링 ─────────────────────────────────────────────────────────
+// 1회성 consume — 읽으면 event.json 삭제
 apiRouter.get('/event', async (_req, res) => {
   const event = await consumeCurrentEvent();
-  if (!event) {
-    return res.status(204).send();
-  }
+  if (!event) return res.status(204).send();
   return res.json(event);
 });
 
-// 대시보드 테스트 버튼용
+// ─── 이벤트 ─────────────────────────────────────────────────────────────────
 apiRouter.post('/api/test-event', async (req, res) => {
   const amount = Number(req.body?.amount ?? 5000);
   const message = String(req.body?.message ?? '테스트 이벤트');
@@ -32,18 +33,62 @@ apiRouter.post('/api/test-event', async (req, res) => {
     : undefined;
 
   const event = createTestDonation(amount, message, eventType);
-  await saveDonationEvent(event);
-  return res.json({ ok: true, event });
+  const saved = await saveDonationEvent(event);
+  return res.json({ ok: true, event: saved });
 });
 
-// 최근 이벤트 로그
 apiRouter.get('/api/logs', async (_req, res) => {
   const logs = await getRecentLogs(50);
   return res.json({ ok: true, logs });
 });
 
-// 현재 event.json 상태 (비소비 — 대시보드 표시용)
 apiRouter.get('/api/status', async (_req, res) => {
   const currentEvent = await getCurrentEvent();
   return res.json({ ok: true, eventFilePath: getEventFilePath(), currentEvent });
+});
+
+// ─── 설정: 이벤트 매핑 ───────────────────────────────────────────────────────
+apiRouter.get('/api/config/event-mapping', (_req, res) => {
+  return res.json({ ok: true, mappings: getMappings() });
+});
+
+apiRouter.put('/api/config/event-mapping', (req, res) => {
+  try {
+    const mappings = req.body?.mappings as MappingEntry[] | undefined;
+    if (!Array.isArray(mappings) || mappings.length === 0) {
+      return res.status(400).json({ ok: false, error: 'mappings 배열 필요' });
+    }
+    for (const m of mappings) {
+      if (typeof m.minAmount !== 'number' || !m.eventType || !m.label) {
+        return res.status(400).json({ ok: false, error: '각 mapping에 minAmount, eventType, label 필요' });
+      }
+    }
+    const updated = updateMappings(mappings);
+    return res.json({ ok: true, mappings: updated });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: String(err) });
+  }
+});
+
+// ─── 설정: 아이템 드랍 ───────────────────────────────────────────────────────
+apiRouter.get('/api/config/item-drops', (_req, res) => {
+  return res.json({ ok: true, items: getItemDrops() });
+});
+
+apiRouter.put('/api/config/item-drops', (req, res) => {
+  try {
+    const items = req.body?.items as ItemDropEntry[] | undefined;
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ ok: false, error: 'items 배열 필요' });
+    }
+    for (const item of items) {
+      if (!item.defName || typeof item.minAmount !== 'number' || typeof item.maxAmount !== 'number' || typeof item.weight !== 'number') {
+        return res.status(400).json({ ok: false, error: '각 item에 defName, minAmount, maxAmount, weight 필요' });
+      }
+    }
+    const updated = updateItemDrops(items);
+    return res.json({ ok: true, items: updated });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: String(err) });
+  }
 });
