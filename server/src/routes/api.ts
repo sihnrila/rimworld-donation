@@ -10,6 +10,7 @@ import { getRecentLogs } from '../services/log.service.js';
 import { getMappings, updateMappings } from '../services/eventMapping.service.js';
 import { getItemDrops, updateItemDrops } from '../services/itemDrop.service.js';
 import { getAppSettings, updateAppSettings, getDefaultEventFilePath } from '../services/settings.service.js';
+import { getRawLogs } from '../services/rawLog.service.js';
 import type { DonationEventType, MappingEntry, ItemDropEntry } from '../types.js';
 
 export const apiRouter = Router();
@@ -116,6 +117,18 @@ apiRouter.put('/api/config/settings', (req, res) => {
   } catch (err) {
     return res.status(500).json({ ok: false, error: String(err) });
   }
+});
+
+// ─── 원시 수신 로그 ──────────────────────────────────────────────────────────
+apiRouter.get('/api/webhook/:platform/raw-logs', async (req, res) => {
+  const allowed = new Set(['chzzk', 'toonation', 'soop']);
+  const { platform } = req.params;
+  if (!allowed.has(platform)) {
+    return res.status(404).json({ ok: false, error: 'Unknown platform' });
+  }
+  const limit = Math.min(Number(req.query['limit'] ?? 20), 100);
+  const logs = await getRawLogs(platform, limit);
+  return res.json({ ok: true, platform, logs });
 });
 
 apiRouter.post('/api/config/settings/reset-event-path', (_req, res) => {
