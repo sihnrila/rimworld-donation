@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>RimWorld Donation Events MVP</name>
+  <author>Rila</author>
+  <supportedVersions>
+    <li>1.5</li>
+  </supportedVersions>
+  <packageId>rila.rimworld.donationevents</packageId>
+  <description>Reads donation event.json and triggers RimWorld incidents.</description>
+</ModMetaData>
