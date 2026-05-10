@@ -4,13 +4,20 @@
 
 ```
 rimworld-donation-mvp/
-├── streamer-app.exe          ← 서버 실행파일 (더블클릭)
-├── rimworld-mod/             ← RimWorld 모드 폴더
+├── streamer-app.exe              ← 서버 실행파일 (더블클릭)
+├── build-mod.ps1                 ← 모드 DLL 빌드 스크립트
 ├── config/
-│   ├── event-mapping.json    ← 금액별 이벤트 매핑 (웹 UI에서 수정 가능)
-│   └── item-drops.json       ← 아이템 드랍 풀 (웹 UI에서 수정 가능)
+│   ├── event-mapping.json        ← 금액별 이벤트 매핑 (웹 UI에서 수정 가능)
+│   └── item-drops.json           ← 아이템 드랍 풀 (웹 UI에서 수정 가능)
+├── release/
+│   └── RimWorldDonationMod/      ← 배포용 모드 폴더 (빌드 후 DLL 추가됨)
+│       ├── About/About.xml
+│       ├── Assemblies/           ← 빌드 후 RimDonation.dll 여기 생성됨
+│       ├── server.url.example    ← 2PC 구성 시 참고
+│       └── README_모드설치.txt
 ├── tools/
-│   └── fake-rimworld-client.js ← RimWorld 없이 연동 테스트용
+│   ├── fake-rimworld-client.js   ← RimWorld 없이 연동 테스트
+│   └── find-rimworld.ps1         ← RimWorld 설치 경로 자동 탐색
 └── README_설치가이드.md
 ```
 
@@ -256,6 +263,83 @@ SERVER_URL=http://192.168.1.100:33210 node tools/fake-rimworld-client.js
 | 2PC — 이벤트 미수신 | 방화벽 차단 | 송출컴 방화벽 33210 포트 인바운드 허용 |
 | 2PC — 이벤트 미수신 | server.url 오타 | `%LocalAppData%\RimWorldDonation\server.url` 내용 확인 |
 | event.json.error 생성 | JSON 파싱 오류 | 서버 재시작 |
+
+---
+
+## 실제 RimWorld 인게임 테스트 방법
+
+### 모드 DLL 빌드
+
+**전제 조건:**
+- RimWorld 설치 (Steam)
+- .NET SDK 6.0 이상 (`winget install Microsoft.DotNet.SDK.8`)
+
+**1단계 — RimWorld 경로 탐색**
+
+```powershell
+.\tools\find-rimworld.ps1
+```
+
+출력 예:
+```
+[찾음] C:\Program Files (x86)\Steam\steamapps\common\RimWorld
+
+모드 빌드 명령어:
+  .\build-mod.ps1
+```
+
+**2단계 — 모드 빌드**
+
+```powershell
+# 경로 자동 탐색
+.\build-mod.ps1
+
+# 경로 직접 지정
+.\build-mod.ps1 -RimWorldPath "D:\SteamLibrary\steamapps\common\RimWorld"
+```
+
+성공 시:
+```
+[1/4] RimWorld 경로 자동 탐색...  경로: C:\...\RimWorld
+[2/4] 의존성 DLL 확인...          Assembly-CSharp.dll  OK
+[3/4] dotnet SDK 확인...          dotnet 8.0.xxx
+[4/4] 빌드 중...
+
+빌드 성공!
+생성된 파일:
+  rimworld-mod\Assemblies\RimDonation.dll
+  release\RimWorldDonationMod\Assemblies\RimDonation.dll
+
+모드 설치 경로:
+  release\RimWorldDonationMod  →  RimWorld\Mods\ 에 복사
+```
+
+**3단계 — 모드 설치**
+
+`release\RimWorldDonationMod\` 폴더를 아래 경로로 복사:
+```
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\
+```
+
+**4단계 — 인게임 테스트**
+
+1. RimWorld 실행
+2. 모드 관리 → **RimWorld Donation Events** 활성화 → 재시작
+3. 새 게임 또는 기존 세이브 로드 (맵 진행 중이어야 함)
+4. `streamer-app.exe` 실행
+5. 브라우저에서 `http://localhost:33210` 접속
+6. 테스트 버튼 클릭 → 약 2초 후 인게임 메시지 확인:
+   ```
+   [후원] 테스트후원자 / 5,000원 → raid
+   ```
+7. RimWorld 개발자 콘솔(F12)에서 `[RimDonation]` 태그로 로그 확인
+
+**인게임 로그 예시:**
+```
+[RimDonation] HTTP 수신: raid / 테스트후원자 / 5000원
+[RimDonation] 이벤트 실행: raid | 테스트후원자 | 5000원
+[RimDonation] 레이드 발생 성공
+```
 
 ---
 

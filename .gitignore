@@ -20,3 +20,4 @@ Thumbs.db
 # RimWorld 빌드 출력
 rimworld-mod/Assemblies/
 rimworld-mod/obj/
+release/RimWorldDonationMod/Assemblies/*.dll

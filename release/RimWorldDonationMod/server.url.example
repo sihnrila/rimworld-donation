@@ -1,0 +1,14 @@
+# RimWorld 후원 연동 서버 URL 설정
+#
+# 사용법:
+#   이 파일을 server.url 로 이름을 바꾸고 URL을 수정하세요.
+#   파일 위치: %LocalAppData%\RimWorldDonation\server.url
+#
+# 1PC 구성 (게임컴 = 송출컴):
+#   기본값 그대로 사용 — 이 파일 없어도 됩니다.
+#
+# 2PC 구성 (게임컴 / 송출컴 분리):
+#   아래 URL을 송출컴 IP로 변경하세요.
+#   예) http://192.168.1.100:33210
+
+http://localhost:33210
